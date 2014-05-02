@@ -1,0 +1,20 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# backup files
+*~
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+build/
+
+# Directory Settings
+.directory

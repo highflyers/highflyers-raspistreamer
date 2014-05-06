@@ -1,5 +1,7 @@
 add_executable(RaspiStreamer
-  main.cpp
+	raspividwrapper.cpp
+	gstudpserver.cpp
+	main.cpp
 )
 
 target_link_libraries(RaspiStreamer ${PKG_LIBRARIES})

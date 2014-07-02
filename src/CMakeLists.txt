@@ -1,8 +1,6 @@
 add_subdirectory(udpstreamer)
 add_subdirectory(protocol)
 
-pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
-
 IF (NOT DEFINED TEST_APP)
 	SET(TEST_APP 0)
 ENDIF()
@@ -11,7 +9,6 @@ ADD_DEFINITIONS(-DTEST_APP=${TEST_APP})
 include_directories(
 	udpstreamer/include
 	protocol
-	${GLIBMM_INCLUDE_DIRS}
 )
 
 add_executable(
@@ -25,5 +22,14 @@ target_link_libraries(
 	raspistreamer
 	udpstreamer
 	raspistream-protocol-lib
-	${GLIBMM_LIBRARIES}
+)
+
+add_executable(
+	test-data-generator
+	test-data-generator.cpp
+)
+
+target_link_libraries(
+	test-data-generator
+	raspistream-protocol-lib
 )

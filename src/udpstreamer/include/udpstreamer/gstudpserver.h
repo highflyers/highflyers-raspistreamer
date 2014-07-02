@@ -12,6 +12,12 @@
 #include <memory>
 #include "raspividwrapper.h"
 
+enum class VideoSource
+{
+	FD,
+	TEST
+};
+
 class GstUDPServer
 {
 private:
@@ -21,15 +27,15 @@ private:
 
 	std::string _ip;
 	int _port;
-
 	const RaspiVidWrapper& rvw;
+	VideoSource video_source;
 
 	void createElements();
 	void addToPipeline();
 	void linkElements();
 
 public:
-	GstUDPServer(const RaspiVidWrapper& rv);
+	GstUDPServer(const RaspiVidWrapper& rv, VideoSource video_source = VideoSource::FD);
 	// necessary because of pImpl and unique_ptr usage
 	virtual ~GstUDPServer();
 

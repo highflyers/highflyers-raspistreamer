@@ -1,6 +1,7 @@
 pkg_check_modules(GSTREAMERMM REQUIRED gstreamermm-1.0)
 include_directories(${GSTREAMERMM_INCLUDE_DIRS})
-link_directories(${GSTREAMERMM_LIBRARY_DIRS})
+
+ADD_DEFINITIONS(-D_MYDEFINE=${_MYDEFINE})
 
 add_library(
 	udpstreamer
@@ -10,4 +11,4 @@ add_library(
 
 include_directories(include/udpstreamer)
 
-target_link_libraries(udpstreamer ${PKG_LIBRARIES})
+target_link_libraries(udpstreamer ${GSTREAMERMM_LIBRARIES})

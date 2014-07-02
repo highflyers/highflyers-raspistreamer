@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 		char* bitrate = getCmdOption(argv, argv + argc, "-b");
 
 		RaspiVidWrapper rvw;
-
+#if !(TEST_APP)
 		if (width)
 			rvw.width(atoi(width));
 		if (height)
@@ -61,6 +61,10 @@ int main(int argc, char** argv)
 		if (rvw.start())
 		{
 			GstUDPServer server(rvw);
+#else
+		{
+			GstUDPServer server(rvw, VideoSource::TEST);
+#endif
 			if (ip)
 				server.ip(ip);
 			if (port)

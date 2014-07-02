@@ -1,4 +1,7 @@
+extern "C" {
 #include <parser.h>
+}
+
 #include <udpstreamer.h>
 #include <glibmm.h>
 

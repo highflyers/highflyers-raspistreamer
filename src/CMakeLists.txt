@@ -16,7 +16,10 @@ include_directories(
 
 add_executable(
 	raspistreamer
-	main.cpp)
+	streamer.cpp
+	config.cpp
+	main.cpp
+)
 
 target_link_libraries(
 	raspistreamer

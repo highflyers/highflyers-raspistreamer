@@ -1,5 +1,4 @@
-#include "raspividwrapper.h"
-#include "gstudpserver.h"
+#include <udpstreamer.h>
 
 char* getCmdOption(char** begin, char** end, const std::string& option)
 {

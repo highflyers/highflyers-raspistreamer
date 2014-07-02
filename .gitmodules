@@ -1,0 +1,3 @@
+[submodule "highflyers-protocol"]
+	path = highflyers-protocol
+	url = git@github.com:loganek/highflyers-protocol

@@ -9,16 +9,15 @@
 #define GSTUDPSERVER_H_
 
 #include <iostream>
-#include <glibmm.h>
-#include <gstreamermm.h>
+#include <memory>
 #include "raspividwrapper.h"
 
 class GstUDPServer
 {
 private:
-	Glib::RefPtr<Gst::Pipeline> pipeline;
-	Glib::RefPtr<Gst::Element> element_source, element_h264parse,
-			element_rtph264pay, element_sink;
+	struct GstElements;
+
+	std::unique_ptr<GstElements> ge;
 
 	std::string _ip;
 	int _port;
@@ -31,6 +30,8 @@ private:
 
 public:
 	GstUDPServer(const RaspiVidWrapper& rv);
+	// necessary because of pImpl and unique_ptr usage
+	virtual ~GstUDPServer();
 
 	void Setup();
 	void Play();

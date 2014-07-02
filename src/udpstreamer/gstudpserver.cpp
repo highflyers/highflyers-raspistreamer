@@ -6,13 +6,26 @@
  */
 
 #include "gstudpserver.h"
+#include <gstreamermm.h>
+
+using namespace Gst;
+using Glib::RefPtr;
+
+struct GstUDPServer::GstElements
+{
+	RefPtr<Pipeline> pipeline;
+	RefPtr<Element> element_source, element_h264parse,element_rtph264pay, element_sink;
+};
+
+GstUDPServer::~GstUDPServer()
+{}
 
 void GstUDPServer::createElements()
 {
-	element_source = Gst::ElementFactory::create_element("fdsrc");
-	element_h264parse = Gst::ElementFactory::create_element("h264parse");
-	element_rtph264pay = Gst::ElementFactory::create_element("rtph264pay");
-	element_sink = Gst::ElementFactory::create_element("udpsink");
+	ge->element_source = ElementFactory::create_element("fdsrc");
+	ge->element_h264parse = ElementFactory::create_element("h264parse");
+	ge->element_rtph264pay = ElementFactory::create_element("rtph264pay");
+	ge->element_sink = ElementFactory::create_element("udpsink");
 }
 
 void GstUDPServer::addToPipeline()
@@ -20,8 +33,8 @@ void GstUDPServer::addToPipeline()
 	// We must add the elements to the pipeline before linking them:
 	try
 	{
-		pipeline->add(element_source)->add(element_h264parse)->add(
-				element_rtph264pay)->add(element_sink);
+		ge->pipeline->add(ge->element_source)->add(ge->element_h264parse)->add(
+				ge->element_rtph264pay)->add(ge->element_sink);
 	} catch (std::runtime_error& ex)
 	{
 		std::cerr << "Exception while adding: " << ex.what() << std::endl;
@@ -33,8 +46,8 @@ void GstUDPServer::linkElements()
 	// Link the elements together:
 	try
 	{
-		element_source->link(element_h264parse)->link(element_rtph264pay)->link(
-				element_sink);
+		ge->element_source->link(ge->element_h264parse)->link(ge->element_rtph264pay)->link(
+				ge->element_sink);
 	} catch (const std::runtime_error& error)
 	{
 		std::cerr << "Exception while linking: " << error.what() << std::endl;
@@ -49,25 +62,26 @@ void GstUDPServer::Setup()
 
 void GstUDPServer::Play()
 {
-	pipeline->set_state(Gst::STATE_PLAYING);
+	ge->pipeline->set_state(STATE_PLAYING);
 }
 
 void GstUDPServer::Stop()
 {
-	pipeline->set_state(Gst::STATE_NULL);
+	ge->pipeline->set_state(STATE_NULL);
 }
 
 GstUDPServer::GstUDPServer(const RaspiVidWrapper& rv) :
+		ge(new GstUDPServer::GstElements()), // make_unique not available...
 		_port(5000), rvw(rv)
 {
-	Gst::init();
-	pipeline = Gst::Pipeline::create("rvpipeline");
+	init();
+	ge->pipeline = Pipeline::create("rvpipeline");
 
 	createElements();
 
-	element_rtph264pay->set_property("config-interval", 10);
-	element_rtph264pay->set_property("pt", 96);
-	element_source->set_property("fd", rvw.getVideoFileDescriptor());
+	ge->element_rtph264pay->set_property("config-interval", 10);
+	ge->element_rtph264pay->set_property("pt", 96);
+	ge->element_source->set_property("fd", rvw.getVideoFileDescriptor());
 }
 
 void GstUDPServer::ip(std::string const& newIP)
@@ -76,11 +90,11 @@ void GstUDPServer::ip(std::string const& newIP)
 	if (_ip.empty())
 		_ip = (char*) "127.0.0.1";
 
-	element_sink->set_property<Glib::ustring>("host", _ip);
+	ge->element_sink->set_property<Glib::ustring>("host", _ip);
 }
 
 void GstUDPServer::port(int const& newPort)
 {
 	_port = newPort;
-	element_sink->set_property("port", _port);
+	ge->element_sink->set_property("port", _port);
 }

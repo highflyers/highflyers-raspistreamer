@@ -34,7 +34,7 @@ void GstUDPServer::createElements()
 		case VideoSource::TEST: return "videotestsrc";
 		case VideoSource::FD:
 		default:
-			return "fd";
+			return "fdsrc";
 		}
 	})()
 	);
@@ -95,7 +95,7 @@ void GstUDPServer::Stop()
 	ge->pipeline->set_state(STATE_NULL);
 }
 
-GstUDPServer::GstUDPServer(const RaspiVidWrapper& rv, VideoSource video_source) :
+GstUDPServer::GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source) :
 		ge(new GstUDPServer::GstElements()), // make_unique not available...
 		_port(5000), rvw(rv), video_source(video_source)
 {
@@ -106,6 +106,7 @@ GstUDPServer::GstUDPServer(const RaspiVidWrapper& rv, VideoSource video_source) 
 
 	ge->rtph264pay->set_property("config-interval", 10);
 	ge->rtph264pay->set_property("pt", 96);
+	rvw.start();
 	if (video_source == VideoSource::FD)
 		ge->source->set_property("fd", rvw.getVideoFileDescriptor());
 }

@@ -27,7 +27,7 @@ private:
 
 	std::string _ip;
 	int _port;
-	const RaspiVidWrapper& rvw;
+	RaspiVidWrapper& rvw;
 	VideoSource video_source;
 
 	void createElements();
@@ -35,7 +35,7 @@ private:
 	void linkElements();
 
 public:
-	GstUDPServer(const RaspiVidWrapper& rv, VideoSource video_source = VideoSource::FD);
+	GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source = VideoSource::FD);
 	// necessary because of pImpl and unique_ptr usage
 	virtual ~GstUDPServer();
 

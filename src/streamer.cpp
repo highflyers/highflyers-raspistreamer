@@ -21,6 +21,8 @@ Streamer::Streamer(int argc, char** argv)
 #endif
 	);
 	parser_initialize(&parser);
+	set_rvw_config();
+	set_server_config();
 }
 
 Streamer::~Streamer()

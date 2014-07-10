@@ -31,6 +31,9 @@ std::string RaspiVidWrapper::prepareArg()
 		oss << " -hf";
 
 	oss << " -n -t 0 -o -";
+
+	printf ("Run raspivid %s", oss.str().c_str());
+
 	return oss.str();
 }
 

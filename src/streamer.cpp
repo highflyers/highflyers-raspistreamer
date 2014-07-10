@@ -82,7 +82,7 @@ static bool flip = false;
 			continue;
 		auto mapper = Glib::RefPtr<Gst::MapInfo>(new Gst::MapInfo());
 		buffer->map(mapper, Gst::MAP_READ);
-		int size = std::min(buffer->get_size(), max_buf);
+		int size = buffer->get_size();
 		std::memcpy(data_dump, mapper->get_data(), size);
 
 		for (int i = 0; i < size; i++)

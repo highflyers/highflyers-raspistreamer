@@ -81,6 +81,12 @@ void GstUDPServer::linkElements()
 
 void GstUDPServer::Setup()
 {
+	ge->pipeline = Pipeline::create("rvpipeline");
+
+	createElements();
+
+	ge->rtph264pay->set_property("config-interval", 10);
+	ge->rtph264pay->set_property("pt", 96);
 	addToPipeline();
 	linkElements();
 }
@@ -113,12 +119,7 @@ GstUDPServer::GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source) :
 		_port(5000), rvw(rv), video_source(video_source)
 {
 	init();
-	ge->pipeline = Pipeline::create("rvpipeline");
 
-	createElements();
-
-	ge->rtph264pay->set_property("config-interval", 10);
-	ge->rtph264pay->set_property("pt", 96);
 }
 
 void GstUDPServer::ip(std::string const& newIP)

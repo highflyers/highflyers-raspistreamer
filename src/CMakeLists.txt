@@ -9,6 +9,7 @@ ADD_DEFINITIONS(-DTEST_APP=${TEST_APP})
 include_directories(
 	udpstreamer/include
 	protocol
+	${GSTREAMERMM_INCLUDE_DIRS}
 )
 
 add_executable(
@@ -32,4 +33,5 @@ add_executable(
 target_link_libraries(
 	test-data-generator
 	raspistream-protocol-lib
+	${GSTREAMERMM_LIBRARIES}
 )

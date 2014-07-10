@@ -55,11 +55,6 @@ void Streamer::set_server_config()
 
 void Streamer::start()
 {
-#if !(TEST_APP)
-	if (!rvw.start())
-		return; // TODO
-#endif
-
 	server->Setup();
 	server->Play();
 

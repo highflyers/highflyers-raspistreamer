@@ -87,6 +87,14 @@ void GstUDPServer::Setup()
 
 void GstUDPServer::Play()
 {
+	#if !(TEST_APP)
+	if (!rvw.start())
+		return; // TODO
+
+	if (video_source == VideoSource::FD)
+			ge->source->set_property("fd", rvw.getVideoFileDescriptor());
+	#endif
+
 	ge->pipeline->set_state(STATE_PLAYING);
 }
 
@@ -106,9 +114,6 @@ GstUDPServer::GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source) :
 
 	ge->rtph264pay->set_property("config-interval", 10);
 	ge->rtph264pay->set_property("pt", 96);
-	rvw.start();
-	if (video_source == VideoSource::FD)
-		ge->source->set_property("fd", rvw.getVideoFileDescriptor());
 }
 
 void GstUDPServer::ip(std::string const& newIP)

@@ -22,6 +22,8 @@ Streamer::Streamer(int argc, char** argv)
 #endif
 	);
 	parser_initialize(&parser);
+	set_rvw_config();
+	set_server_config();
 }
 
 Streamer::~Streamer()
@@ -55,11 +57,6 @@ void Streamer::set_server_config()
 #include <gstreamermm.h>
 void Streamer::start()
 {
-#if !(TEST_APP)
-	if (!rvw.start())
-		return; // TODO
-#endif
-
 	server->Setup();
 	server->Play();
 

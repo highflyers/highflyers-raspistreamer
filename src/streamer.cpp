@@ -22,8 +22,7 @@ Streamer::Streamer(int argc, char** argv)
 #endif
 	);
 	parser_initialize(&parser);
-	set_rvw_config();
-	set_server_config();
+
 }
 
 Streamer::~Streamer()
@@ -58,6 +57,8 @@ void Streamer::set_server_config()
 void Streamer::start()
 {
 	server->Setup();
+	set_rvw_config();
+		set_server_config();
 	server->Play();
 
 	Glib::RefPtr<Gst::Pipeline> pipe_proto = Gst::Pipeline::create();
@@ -93,10 +94,11 @@ static bool flip = false;
 				flip = !flip;
 				rvw.horizontalFlip(flip);
 				server->Stop();
-				set_rvw_config();
-				set_server_config();
+
 
 				server->Setup();
+				set_rvw_config();
+								set_server_config();
 				server->Play();
 			}
 		}

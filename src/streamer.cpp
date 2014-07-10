@@ -62,16 +62,16 @@ void Streamer::start()
 
 	Glib::RefPtr<Gst::Pipeline> pipe_proto = Gst::Pipeline::create();
 	Glib::RefPtr<Gst::Element> udpsrc = Gst::ElementFactory::create_element("udpsrc");
-	udpsrc->property<Glib::ustring>("multicast-group", "127.0.0.1")->
-			property<Glib::ustring>("multicast-iface", "lo")->
-			property<int>("port", 5005);
+	udpsrc->property<Glib::ustring>("multicast-group", "192.168.1.103")->
+			property<Glib::ustring>("multicast-iface", "wlan0")->
+			property<int>("port", 5015);
 	Glib::RefPtr<Gst::AppSink> sink = Gst::AppSink::create();
 	pipe_proto->add(udpsrc)->add(sink);
 	udpsrc->link(sink);
 	pipe_proto->set_state(Gst::STATE_PLAYING);
 	constexpr unsigned long max_buf = 2048;
 	unsigned char data_dump[max_buf];
-
+static bool flip = false;
 	while (true)
 	{
 		auto sample = sink->pull_sample();
@@ -88,6 +88,17 @@ void Streamer::start()
 		for (int i = 0; i < size; i++)
 		{
 			std::cout << data_dump[i] << std::endl;
+			if (data_dump[i] == 'h')
+			{
+				flip = !flip;
+				rvw.horizontalFlip(flip);
+				server->Stop();
+				set_rvw_config();
+				set_server_config();
+
+				server->Setup();
+				server->Play();
+			}
 		}
 
 		// todo read from uart

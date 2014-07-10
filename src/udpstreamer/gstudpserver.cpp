@@ -101,6 +101,11 @@ void GstUDPServer::Play()
 void GstUDPServer::Stop()
 {
 	ge->pipeline->set_state(STATE_NULL);
+
+	#if !(TEST_APP)
+	if (!rvw.close())
+		return; // TODO
+	#endif
 }
 
 GstUDPServer::GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source) :

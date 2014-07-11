@@ -27,16 +27,17 @@ GstUDPServer::~GstUDPServer()
 
 void GstUDPServer::createElements()
 {
+	ge->pipeline = Pipeline::create();
 	ge->source = ElementFactory::create_element("fdsrc");
 	ge->h264parse = ElementFactory::create_element(
-#if TEST_APP
-			"identity"
-#else
+#if !(TEST_APP)
 			"h264parse"
+#else
+			"identity"
 #endif
 	);
 	ge->rtph264pay = ElementFactory::create_element(
-#if TEST_APP
+#if !(TEST_APP)
 			"rtph264pay"
 #else
 			"identity"
@@ -75,6 +76,7 @@ void GstUDPServer::linkElements()
 
 void GstUDPServer::Setup()
 {
+	createElements();
 	addToPipeline();
 	linkElements();
 }
@@ -85,12 +87,22 @@ void GstUDPServer::Play()
 		return; // TODO
 
 	ge->source->set_property("fd", rvw.getVideoFileDescriptor());
+	ge->sink->set_property<Glib::ustring>("host", _ip);
+	ge->sink->set_property("port", _port);
+#if !(TEST_APP)
+	ge->rtph264pay->set_property("config-interval", 10);
+	ge->rtph264pay->set_property("pt", 96);
+#endif
+
 	ge->pipeline->set_state(STATE_PLAYING);
 }
 
 void GstUDPServer::Stop()
 {
+	if (!rvw.close())
+		return; // todo
 	ge->pipeline->set_state(STATE_NULL);
+	ge->pipeline.reset();
 }
 
 GstUDPServer::GstUDPServer(RaspiVidWrapper& rv) :
@@ -98,12 +110,6 @@ GstUDPServer::GstUDPServer(RaspiVidWrapper& rv) :
 		_port(5000), rvw(rv)
 {
 	init();
-	ge->pipeline = Pipeline::create("rvpipeline");
-
-	createElements();
-
-	ge->rtph264pay->set_property("config-interval", 10);
-	ge->rtph264pay->set_property("pt", 96);
 }
 
 void GstUDPServer::ip(std::string const& newIP)
@@ -111,12 +117,9 @@ void GstUDPServer::ip(std::string const& newIP)
 	_ip = newIP;
 	if (_ip.empty())
 		_ip = (char*) "127.0.0.1";
-
-	ge->sink->set_property<Glib::ustring>("host", _ip);
 }
 
 void GstUDPServer::port(int const& newPort)
 {
 	_port = newPort;
-	ge->sink->set_property("port", _port);
 }

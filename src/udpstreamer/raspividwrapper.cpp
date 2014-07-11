@@ -17,7 +17,7 @@ RaspiVidWrapper::RaspiVidWrapper() :
 std::string RaspiVidWrapper::prepareArg()
 {
 	std::ostringstream oss;
-#if TEST_APP
+#if !(TEST_APP)
 	oss << "raspivid";
 
 	oss << " -w " << _width;
@@ -33,10 +33,11 @@ std::string RaspiVidWrapper::prepareArg()
 
 	oss << " -n -t 0 -o -";
 #else
-	oss << "gst-launch-1.0 videotestsrc ! x264enc ! fdsink";
+	oss << "gst-launch-1.0 videotestsrc ! video/x-raw,framerate=" << _framerate << "/2 ! x264enc ! fdsink sync=1";
 #endif
 
 	printf ("Run raspivid: %s", oss.str().c_str());
+	puts ("");
 
 	return oss.str();
 }

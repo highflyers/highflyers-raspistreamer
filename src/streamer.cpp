@@ -15,9 +15,14 @@ Streamer::Streamer(int argc, char** argv)
 : config(argc, argv)
 {
 	server = std::make_shared<GstUDPServer>(rvw);
-	parser_initialize(&parser);
-	set_rvw_config();
-	set_server_config();
+
+	dmgr.set_stream_info_callback([this](StreamerInfo* info){
+		server->Stop();
+		rvw.framerate(info->framerate);
+		server->Setup();
+		server->Play();
+
+	});
 }
 
 Streamer::~Streamer()
@@ -51,32 +56,12 @@ void Streamer::set_server_config()
 void Streamer::start()
 {
 	server->Setup();
+	set_rvw_config();
+	set_server_config();
 	server->Play();
 
-	while (true)
-	{
-		// todo read from uart
-		byte b;
-		std::cin >> b;
-		parser_append_byte(&parser, b);
-		std::cout << "dodalem bajt";
-		if (!parser_has_frame(&parser))
-			continue;
-
-		FrameProxy proxy = parser_get_last_frame_ownership(&parser);
-
-		switch (proxy.type)
-		{
-		case T_StreamerInfo:
-			update_stream_info(static_cast<StreamerInfo*>(proxy.pointer));
-			server->Setup();
-			server->Play();
-			break;
-		default:
-			break;
-		}
-		frame_proxy_free(&proxy);
-	}
+	dmgr.start(config.ip, config.port + 1);
+	while (true);
 }
 
 void Streamer::update_stream_info(const StreamerInfo* info)

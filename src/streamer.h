@@ -9,9 +9,7 @@
 #define STREAMER_H_
 
 #include "config.h"
-extern "C" { // todo it should be moved to a library
-#include <parser.h>
-}
+#include "datamanager.h"
 #include <udpstreamer.h>
 
 class Streamer
@@ -19,8 +17,8 @@ class Streamer
 private:
 	RaspiVidWrapper rvw;
 	std::shared_ptr<GstUDPServer> server;
-	HighFlyersParser parser;
 	Config config;
+	DataManager dmgr;
 
 	void set_rvw_config();
 	void set_server_config();

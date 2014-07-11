@@ -27,23 +27,22 @@ GstUDPServer::~GstUDPServer()
 
 void GstUDPServer::createElements()
 {
-	ge->source = ElementFactory::create_element(
-			([this]{
-		switch (video_source)
-		{
-		case VideoSource::TEST: return "videotestsrc";
-		case VideoSource::FD:
-		default:
-			return "fdsrc";
-		}
-	})()
+	ge->source = ElementFactory::create_element("fdsrc");
+	ge->h264parse = ElementFactory::create_element(
+#if TEST_APP
+			"identity"
+#else
+			"h264parse"
+#endif
 	);
-	ge->h264parse = ElementFactory::create_element("h264parse");
-	ge->rtph264pay = ElementFactory::create_element("rtph264pay");
+	ge->rtph264pay = ElementFactory::create_element(
+#if TEST_APP
+			"rtph264pay"
+#else
+			"identity"
+#endif
+	);
 	ge->sink = ElementFactory::create_element("udpsink");
-
-	if (video_source == VideoSource::TEST)
-		ge->x264enc = ElementFactory::create_element("x264enc");
 }
 
 void GstUDPServer::addToPipeline()
@@ -53,8 +52,6 @@ void GstUDPServer::addToPipeline()
 	{
 		ge->pipeline->add(ge->source)->add(ge->h264parse)->add(
 				ge->rtph264pay)->add(ge->sink);
-		if (video_source == VideoSource::TEST)
-			ge->pipeline->add(ge->x264enc);
 
 	} catch (std::runtime_error& ex)
 	{
@@ -67,10 +64,7 @@ void GstUDPServer::linkElements()
 	// Link the elements together:
 	try
 	{
-		if (video_source == VideoSource::TEST)
-			ge->source->link(ge->x264enc)->link(ge->h264parse);
-		else
-			ge->source->link(ge->h264parse);
+		ge->source->link(ge->h264parse);
 		ge->h264parse->link(ge->rtph264pay)->link(
 				ge->sink);
 	} catch (const std::runtime_error& error)
@@ -87,14 +81,10 @@ void GstUDPServer::Setup()
 
 void GstUDPServer::Play()
 {
-	#if !(TEST_APP)
 	if (!rvw.start())
 		return; // TODO
 
-	if (video_source == VideoSource::FD)
-			ge->source->set_property("fd", rvw.getVideoFileDescriptor());
-	#endif
-
+	ge->source->set_property("fd", rvw.getVideoFileDescriptor());
 	ge->pipeline->set_state(STATE_PLAYING);
 }
 
@@ -103,9 +93,9 @@ void GstUDPServer::Stop()
 	ge->pipeline->set_state(STATE_NULL);
 }
 
-GstUDPServer::GstUDPServer(RaspiVidWrapper& rv, VideoSource video_source) :
+GstUDPServer::GstUDPServer(RaspiVidWrapper& rv) :
 		ge(new GstUDPServer::GstElements()), // make_unique not available...
-		_port(5000), rvw(rv), video_source(video_source)
+		_port(5000), rvw(rv)
 {
 	init();
 	ge->pipeline = Pipeline::create("rvpipeline");

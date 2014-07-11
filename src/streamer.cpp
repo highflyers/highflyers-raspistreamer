@@ -14,12 +14,7 @@
 Streamer::Streamer(int argc, char** argv)
 : config(argc, argv)
 {
-	server = std::make_shared<GstUDPServer>(
-			rvw
-#if TEST_APP
-			, VideoSource::TEST
-#endif
-	);
+	server = std::make_shared<GstUDPServer>(rvw);
 	parser_initialize(&parser);
 	set_rvw_config();
 	set_server_config();

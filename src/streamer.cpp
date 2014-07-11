@@ -6,6 +6,46 @@
 */
 
 #include "streamer.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
+
+template<typename T, int LEN, int INET>
+std::string check_addr(ifaddrs* ifa)
+{
+	void* tmpAddrPtr = &((T*)ifa->ifa_addr)->sin_addr;
+	char addressBuffer[LEN];
+	inet_ntop(INET, tmpAddrPtr, addressBuffer, LEN);
+	return !strncmp("wlan", ifa->ifa_name, 4) ? addressBuffer : "";
+}
+
+std::string get_ip_address()
+{
+	ifaddrs * ifAddrStruct = NULL;
+	ifaddrs * ifa = NULL;
+	std::string ret = "";
+
+	getifaddrs(&ifAddrStruct);
+
+	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if (ifa ->ifa_addr->sa_family==AF_INET)
+			ret = check_addr<sockaddr_in, INET_ADDRSTRLEN, AF_INET>(ifa);
+		else if (ifa->ifa_addr->sa_family==AF_INET6)
+			ret = check_addr<sockaddr_in, INET6_ADDRSTRLEN, AF_INET6>(ifa);
+
+		if (!ret.empty())
+			break;
+	}
+
+	if (ifAddrStruct!=NULL)
+		freeifaddrs(ifAddrStruct);
+
+	return ret.empty() ? "127.0.0.1" : ret; // todo serious problem
+}
 
 #define SET_IF_NOT_MINUS(VALUE, METHOD) \
 	if (config.VALUE!= -1) \
@@ -60,7 +100,7 @@ void Streamer::start()
 	set_server_config();
 	server->Play();
 
-	dmgr.start(config.ip, config.port + 1);
+	dmgr.start(get_ip_address(), config.port + 1);
 	while (true);
 }
 

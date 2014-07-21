@@ -15,12 +15,14 @@ class ArduPilotPopper
 private:
 	std::thread streamer;
 	std::thread writer;
+	int fd;
 
 	int read_from_uart();
 	void write_to_uart(unsigned char c);
 	void stream_to_ground();
 	void write_to_quadro();\
 public:
+	void open();
 	void run();
 };
 

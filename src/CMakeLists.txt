@@ -6,6 +6,8 @@ IF (NOT DEFINED TEST_APP)
 ENDIF()
 ADD_DEFINITIONS(-DTEST_APP=${TEST_APP})
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwiringPi")
+
 include_directories(
 	udpstreamer/include
 	protocol

@@ -8,18 +8,24 @@
 #include "ArduPilotPopper.h"
 #include <gstreamermm/appsink.h>
 #include <gstreamermm.h>
+#include <wiringSerial.h>
 
 using namespace Gst;
 using Glib::RefPtr;
 
+void ArduPilotPopper::open()
+{
+	fd = serialOpen("/dev/ttyAMA0", 115200);
+}
+
 void ArduPilotPopper::write_to_uart(unsigned char c)
 {
-	// todo
+	serialPutchar(fd, c);
 }
 
 int ArduPilotPopper::read_from_uart()
 {
-	return 10; // todo
+	return serialGetchar(fd);
 }
 
 void ArduPilotPopper::stream_to_ground()

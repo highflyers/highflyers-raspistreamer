@@ -31,6 +31,8 @@ int ArduPilotPopper::read_from_uart()
 void ArduPilotPopper::stream_to_ground()
 {
 	RefPtr<Element> udpsink = ElementFactory::create_element("udpsink");
+	udpsink->property<Glib::ustring>("host", "192.168.1.100");
+	udpsink->property("port", 5009);
 
 	RefPtr<Pad> pusher = Pad::create(PadTemplate::create("pusher_tpl", PAD_SRC, PAD_ALWAYS, Caps::create_any()));
 	pusher->set_active(true);
@@ -53,6 +55,8 @@ void ArduPilotPopper::stream_to_ground()
 void ArduPilotPopper::write_to_quadro()
 {
 	RefPtr<Element> udpsrc = ElementFactory::create_element("udpsrc");
+	udpsrc->property<Glib::ustring>("multicast-iface", "192.168.1.100");
+	udpsrc->property("port", 5010);
 	RefPtr<AppSink> sink = AppSink::create();
 	RefPtr<Pipeline> pipe = Pipeline::create();
 	pipe->add(udpsrc)->add(sink);

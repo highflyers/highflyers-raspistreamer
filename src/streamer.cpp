@@ -24,6 +24,9 @@ std::string check_addr(ifaddrs* ifa)
 
 std::string get_ip_address()
 {
+#if TEST_APP
+	return "127.0.0.1";
+#endif
 	ifaddrs * ifAddrStruct = NULL;
 	ifaddrs * ifa = NULL;
 	std::string ret = "";
@@ -57,6 +60,7 @@ Streamer::Streamer(int argc, char** argv)
 	server = std::make_shared<GstUDPServer>(rvw);
 
 	dmgr.set_stream_info_callback([this](StreamerInfo* info){
+		puts ("mom");
 		server->Stop();
 		rvw.framerate(info->framerate);
 		server->Setup();

@@ -13,6 +13,7 @@ using Glib::RefPtr;
 
 void DataManager::start(const std::string& ip, int port)
 {
+	printf ("IP: %s Port: %d\n", ip.c_str(), port);
 	rec_thread = std::thread([this, ip, port]{
 		RefPtr<Pipeline> pipeline = Pipeline::create();
 		RefPtr<Element> src = ElementFactory::create_element("udpsrc");

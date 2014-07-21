@@ -16,6 +16,7 @@ add_executable(
 	raspistreamer
 	streamer.cpp
 	datamanager.cpp
+	ArduPilotPopper.cpp
 	config.cpp
 	main.cpp
 )

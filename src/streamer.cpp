@@ -58,7 +58,7 @@ Streamer::Streamer(int argc, char** argv)
 : config(argc, argv)
 {
 	server = std::make_shared<GstUDPServer>(rvw);
-
+	popper.open();
 	dmgr.set_stream_info_callback([this](StreamerInfo* info){
 		puts ("mom");
 		server->Stop();
@@ -99,6 +99,7 @@ void Streamer::set_server_config()
 
 void Streamer::start()
 {
+	popper.run();
 	server->Setup();
 	set_rvw_config();
 	set_server_config();

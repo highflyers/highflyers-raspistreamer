@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "datamanager.h"
+#include "ArduPilotPopper.h"
 #include <udpstreamer.h>
 
 class Streamer
@@ -19,6 +20,7 @@ private:
 	std::shared_ptr<GstUDPServer> server;
 	Config config;
 	DataManager dmgr;
+	ArduPilotPopper popper;
 
 	void set_rvw_config();
 	void set_server_config();

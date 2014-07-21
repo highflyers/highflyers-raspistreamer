@@ -16,16 +16,24 @@ using Glib::RefPtr;
 void ArduPilotPopper::open()
 {
 	fd = serialOpen("/dev/ttyAMA0", 115200);
+
+	printf ("connected to /dev/ttyAMA0. Descriptor: %d\n", fd);
 }
 
 void ArduPilotPopper::write_to_uart(unsigned char c)
 {
+	puts ("write to uart"); // todo debug
 	serialPutchar(fd, c);
 }
 
 int ArduPilotPopper::read_from_uart()
 {
-	return serialGetchar(fd);
+	if (fd == -1)
+		return -1;
+	int d = serialGetchar(fd);
+	printf ("reading from uart %d\n", d); // todo debug
+
+	return d;
 }
 
 void ArduPilotPopper::stream_to_ground()
@@ -68,6 +76,7 @@ void ArduPilotPopper::write_to_quadro()
 	while (true)
 	{
 		auto sample = sink->pull_sample();
+		puts ("Got sample from gcs"); // todo debug
 		if (!sample) continue;
 		auto buf = sample->get_buffer();
 		if (!buf) continue;

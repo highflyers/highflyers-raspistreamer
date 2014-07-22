@@ -22,7 +22,7 @@ void ArduPilotPopper::open()
 {
 	fd = serialOpen("/dev/ttyAMA0", config.serial_speed);
 
-	printf ("connected to /dev/ttyAMA0. Descriptor: %d\n", fd);
+	printf ("connected to /dev/ttyAMA0. Descriptor: %d, speed: %d\n", fd, config.serial_speed);
 }
 
 void ArduPilotPopper::write_to_uart(unsigned char c)
@@ -46,6 +46,8 @@ void ArduPilotPopper::stream_to_ground()
 	RefPtr<Element> udpsink = ElementFactory::create_element("udpsink");
 	udpsink->property<Glib::ustring>("host", config.mpl_ip);
 	udpsink->property("port", config.mpl_port);
+
+	printf ("Streaming to ground. Port: %d, GroundIP: %s\n", config.mpl_port, config.mpl_ip.c_str());
 
 	RefPtr<Pad> pusher = Pad::create(PadTemplate::create("pusher_tpl", PAD_SRC, PAD_ALWAYS, Caps::create_any()));
 	pusher->set_active(true);
@@ -73,6 +75,9 @@ void ArduPilotPopper::write_to_quadro()
 	RefPtr<Element> udpsrc = ElementFactory::create_element("udpsrc");
 	udpsrc->property<Glib::ustring>("multicast-iface", config.mpl_ip);
 	udpsrc->property("port", config.mpl_port);
+
+	printf ("Writing to quadro from ground. Port: %d, GroundIP: %s\n", config.mpl_port, config.mpl_ip.c_str());
+
 	RefPtr<AppSink> sink = AppSink::create();
 	RefPtr<Pipeline> pipe = Pipeline::create();
 	pipe->add(udpsrc)->add(sink);

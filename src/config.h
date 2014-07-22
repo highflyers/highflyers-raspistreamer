@@ -21,6 +21,9 @@ struct Config
 	int bitrate = -1;
 	bool horizontal_flip = false;
 	bool vertical_flip = false;
+	int mpl_port = -1;
+	std::string mpl_ip;
+	int serial_speed = -1;
 
 	Config();
 	Config(int argc, char** argv);

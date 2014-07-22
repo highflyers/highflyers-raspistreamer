@@ -13,9 +13,14 @@
 using namespace Gst;
 using Glib::RefPtr;
 
+ArduPilotPopper::ArduPilotPopper(const Config& config)
+:config (config)
+{
+}
+
 void ArduPilotPopper::open()
 {
-	fd = serialOpen("/dev/ttyAMA0", 115200);
+	fd = serialOpen("/dev/ttyAMA0", config.serial_speed);
 
 	printf ("connected to /dev/ttyAMA0. Descriptor: %d\n", fd);
 }
@@ -39,8 +44,8 @@ int ArduPilotPopper::read_from_uart()
 void ArduPilotPopper::stream_to_ground()
 {
 	RefPtr<Element> udpsink = ElementFactory::create_element("udpsink");
-	udpsink->property<Glib::ustring>("host", "192.168.1.100");
-	udpsink->property("port", 5009);
+	udpsink->property<Glib::ustring>("host", config.mpl_ip);
+	udpsink->property("port", config.mpl_port);
 
 	RefPtr<Pad> pusher = Pad::create(PadTemplate::create("pusher_tpl", PAD_SRC, PAD_ALWAYS, Caps::create_any()));
 	pusher->set_active(true);
@@ -66,8 +71,8 @@ void ArduPilotPopper::stream_to_ground()
 void ArduPilotPopper::write_to_quadro()
 {
 	RefPtr<Element> udpsrc = ElementFactory::create_element("udpsrc");
-	udpsrc->property<Glib::ustring>("multicast-iface", "192.168.1.100");
-	udpsrc->property("port", 5010);
+	udpsrc->property<Glib::ustring>("multicast-iface", config.mpl_ip);
+	udpsrc->property("port", config.mpl_port);
 	RefPtr<AppSink> sink = AppSink::create();
 	RefPtr<Pipeline> pipe = Pipeline::create();
 	pipe->add(udpsrc)->add(sink);

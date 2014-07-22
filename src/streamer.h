@@ -20,7 +20,7 @@ private:
 	std::shared_ptr<GstUDPServer> server;
 	Config config;
 	DataManager dmgr;
-	ArduPilotPopper popper;
+	std::shared_ptr<ArduPilotPopper> popper;
 
 	void set_rvw_config();
 	void set_server_config();

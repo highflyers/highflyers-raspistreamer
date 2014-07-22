@@ -17,6 +17,9 @@ private:
 	std::thread writer;
 	int fd;
 
+	static const int max_size = 2048;
+	unsigned char buffer[max_size];
+
 	int read_from_uart();
 	void write_to_uart(unsigned char c);
 	void stream_to_ground();

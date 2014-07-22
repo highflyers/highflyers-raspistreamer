@@ -46,17 +46,20 @@ void ArduPilotPopper::stream_to_ground()
 	pusher->set_active(true);
 	pusher->link(udpsink->get_static_pad("sink"));
 	udpsink->set_state(STATE_PLAYING);
-
+	int pos = 0;
 	while (true) // todo
 	{
 		int b = read_from_uart();
 
 		if (b == -1)
 			continue;
-		unsigned char x = (unsigned char)b;
-		RefPtr<Buffer> buf = Buffer::create(1);
-		gst_buffer_fill(buf->gobj(), 0, &x, 1);
-		pusher->push(buf);
+		buffer[pos++] = (unsigned char)b;
+		if (pos >= max_size)
+		{
+			RefPtr<Buffer> buf = Buffer::create(max_size);
+			gst_buffer_fill(buf->gobj(), 0, buffer, max_size);
+			pusher->push(buf);
+		}
 	}
 }
 
@@ -81,9 +84,7 @@ void ArduPilotPopper::write_to_quadro()
 		auto buf = sample->get_buffer();
 		if (!buf) continue;
 		buf->map(mapper, MAP_READ);
-
-		for (size_t i = 0; i < buf->get_size(); i++)
-			write_to_uart(mapper->get_data()[i]);
+		write (fd, mapper->get_data(), buf->get_size());
 		buf->unmap(mapper);
 	}
 }

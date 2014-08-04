@@ -27,7 +27,6 @@ void ArduPilotPopper::open()
 
 void ArduPilotPopper::write_to_uart(unsigned char c)
 {
-	puts ("write to uart"); // todo debug
 	serialPutchar(fd, c);
 }
 
@@ -35,8 +34,8 @@ int ArduPilotPopper::read_from_uart()
 {
 	if (fd == -1)
 		return -1;
+
 	int d = serialGetchar(fd);
-	printf ("reading from uart %d\n", d); // todo debug
 
 	return d;
 }
@@ -53,20 +52,13 @@ void ArduPilotPopper::stream_to_ground()
 	pusher->set_active(true);
 	pusher->link(udpsink->get_static_pad("sink"));
 	udpsink->set_state(STATE_PLAYING);
-	int pos = 0;
+
 	while (true) // todo
 	{
-		int b = read_from_uart();
-
-		if (b == -1)
-			continue;
-		buffer[pos++] = (unsigned char)b;
-		if (pos >= max_size)
-		{
-			RefPtr<Buffer> buf = Buffer::create(max_size);
-			gst_buffer_fill(buf->gobj(), 0, buffer, max_size);
-			pusher->push(buf);
-		}
+		int s = read(fd, buffer, max_size);
+		RefPtr<Buffer> buf = Buffer::create(s);
+		gst_buffer_fill(buf->gobj(), 0, buffer, s);
+		pusher->push(buf);
 	}
 }
 
@@ -89,7 +81,6 @@ void ArduPilotPopper::write_to_quadro()
 	while (true)
 	{
 		auto sample = sink->pull_sample();
-		puts ("Got sample from gcs"); // todo debug
 		if (!sample) continue;
 		auto buf = sample->get_buffer();
 		if (!buf) continue;

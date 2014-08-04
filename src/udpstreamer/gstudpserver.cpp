@@ -85,7 +85,7 @@ void GstUDPServer::Play()
 {
 	if (!rvw.start())
 		return; // TODO
-
+	printf ("stream to: %s  %d", _ip.c_str(), _port);
 	ge->source->set_property("fd", rvw.getVideoFileDescriptor());
 	ge->sink->set_property<Glib::ustring>("host", _ip);
 	ge->sink->set_property("port", _port);

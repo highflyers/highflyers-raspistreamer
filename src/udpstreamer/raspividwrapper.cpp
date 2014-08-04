@@ -37,7 +37,6 @@ std::string RaspiVidWrapper::prepareArg()
 #endif
 
 	printf ("Run raspivid: %s", oss.str().c_str());
-	puts ("");
 
 	return oss.str();
 }

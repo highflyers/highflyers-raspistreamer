@@ -3,13 +3,29 @@ auto lo
 iface lo inet loopback
 iface eth0 inet dhcp
 
-auto wlan0
+#auto wlan0
 allow-hotplug wlan0
 
-iface wlan0 inet dhcp
-	wpa-ssid "HighFlyers"
-	wpa-psk "password-here"
+#iface wlan0 inet dhcp
+#	wpa-ssid "HighFlyers"
+#	wpa-psk "romankrul"
 
+iface wlan0 inet static
+#wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+
+#iface home inet static
+address 192.168.1.32
+netmask 255.255.255.0
+gateway 192.168.1.1
+
+# wpa/psk:
+#wpa-ssid ubnt
+#wpa-psk string-password
+
+#wep
+wireless-essid ubnt
+wireless-key s:string-password
+#iface default inet dhcp
 
 
 

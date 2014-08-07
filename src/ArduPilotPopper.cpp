@@ -52,12 +52,18 @@ void ArduPilotPopper::stream_to_ground()
 	pusher->set_active(true);
 	pusher->link(udpsink->get_static_pad("sink"));
 	udpsink->set_state(STATE_PLAYING);
-
+	int ctr = 0, total = 0;
 	while (true) // todo
 	{
-		int s = read(fd, buffer, max_size);
-		RefPtr<Buffer> buf = Buffer::create(s);
-		gst_buffer_fill(buf->gobj(), 0, buffer, s);
+		int s = read(fd, static_cast<unsigned char*>(buffer + total), max_size - total);
+		total += s;
+		ctr++;
+		if (ctr < 15 && total < max_size)
+			continue;
+		RefPtr<Buffer> buf = Buffer::create(total);
+		gst_buffer_fill(buf->gobj(), 0, buffer, total);
+		total = 0;
+		ctr = 0;
 		pusher->push(buf);
 	}
 }

@@ -19,8 +19,7 @@ private:
 	int fd = 0;
 	Config config;
 
-	static const int max_size = 2048;
-	unsigned char buffer[max_size];
+	unsigned char buffer[8096];
 
 	int read_from_uart();
 	void write_to_uart(unsigned char c);

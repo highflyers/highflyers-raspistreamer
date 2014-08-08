@@ -55,10 +55,10 @@ void ArduPilotPopper::stream_to_ground()
 	int ctr = 0, total = 0;
 	while (true) // todo
 	{
-		int s = read(fd, static_cast<unsigned char*>(buffer + total), max_size - total);
+		int s = read(fd, static_cast<unsigned char*>(buffer + total), config.max_udp_size - total);
 		total += s;
 		ctr++;
-		if (ctr < 15 && total < max_size)
+		if (ctr < config.max_mavlink_cnt && total < config.max_udp_size)
 			continue;
 		RefPtr<Buffer> buf = Buffer::create(total);
 		gst_buffer_fill(buf->gobj(), 0, buffer, total);

@@ -24,6 +24,8 @@ struct Config
 	int mpl_port = -1;
 	std::string mpl_ip;
 	int serial_speed = -1;
+        int max_mavlink_cnt = -1;
+        int max_udp_size = -1;
 
 	Config();
 	Config(int argc, char** argv);
